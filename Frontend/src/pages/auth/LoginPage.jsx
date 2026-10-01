@@ -35,15 +35,28 @@ export function LoginPage() {
 
   const onSubmit = async (data) => {
     try {
+      // Determine mock role based on email
+      let role = 'admin';
+      const emailLower = data.email.toLowerCase();
+      if (emailLower.includes('doctor')) role = 'doctor';
+      else if (emailLower.includes('nurse')) role = 'nurse';
+      else if (emailLower.includes('receptionist')) role = 'receptionist';
+      else if (emailLower.includes('patient')) role = 'patient';
+      else if (emailLower.includes('pharmacist')) role = 'pharmacist';
+      else if (emailLower.includes('lab')) role = 'lab_technician';
+
       // Mock login authentication
       login({
-        user: { id: 1, name: 'Admin User', email: data.email },
+        user: { id: 1, name: `${role.charAt(0).toUpperCase() + role.slice(1)} User`, email: data.email },
         token: 'mock-jwt-token',
-        role: 'admin',
+        role: role,
       });
 
       toast.success('Signed in successfully!');
-      navigate('/admin');
+      
+      // Navigate to respective dashboard
+      const dashboardPath = `/${role === 'lab_technician' ? 'lab' : role}`;
+      navigate(dashboardPath);
     } catch {
       toast.error('Failed to sign in. Please verify your credentials.');
     }
